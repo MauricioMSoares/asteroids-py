@@ -23,12 +23,15 @@ pygame.display.set_caption("Asteroids")
 bg = pygame.image.load(os.path.join("images", "bg.jpg"))
 debris = pygame.image.load(os.path.join("images", "debris2_brown.png"))
 ship = pygame.image.load(os.path.join("images", "ship.png"))
+ship_thrusted = pygame.image.load(os.path.join("images", "ship_thrusted.png"))
 
 ship_x = WIDTH / 2 - 50
 ship_y = HEIGHT / 2 - 50
 ship_angle = 0
 ship_is_rotating = False
+ship_is_moving = False
 ship_direction = 0
+ship_speed = 0
 
 
 def rot_center(image, angle):
@@ -42,16 +45,22 @@ def rot_center(image, angle):
 
 def draw(canvas):
     global time
+    global ship_is_moving
     canvas.fill(BLACK)
     canvas.blit(bg, (0, 0))
     canvas.blit(debris, (time * 0.3, 0))
     canvas.blit(debris, (time * 0.3 - WIDTH, 0))
     time += 1
-    canvas.blit(rot_center(ship, ship_angle), (ship_x, ship_y))
+    
+    if ship_is_moving:
+        canvas.blit(rot_center(ship_thrusted, ship_angle), (ship_x, ship_y))
+    else:
+        canvas.blit(rot_center(ship, ship_angle), (ship_x, ship_y))
 
 
 def handle_input():
     global ship_angle, ship_is_rotating, ship_direction
+    global ship_x, ship_y, ship_speed, ship_is_moving
 
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -64,14 +73,27 @@ def handle_input():
             elif event.key == K_RIGHT:
                 ship_is_rotating = True
                 ship_direction = 1
+            elif event.key == K_UP:
+                ship_is_moving = True
+                ship_speed = 10
+
         elif event.type == KEYUP:
-            ship_is_rotating = False
+            if event.key == K_LEFT or event.key == K_RIGHT:
+                ship_is_rotating = False
+            else:
+                ship_is_moving = False
 
     if ship_is_rotating:
         if ship_direction == 0:
             ship_angle += 10
         else:
             ship_angle -= 10
+
+    if ship_is_moving or ship_speed > 0:
+        ship_x = ship_x + math.cos(math.radians(ship_angle)) * ship_speed
+        ship_y = ship_y - math.sin(math.radians(ship_angle)) * ship_speed
+        if ship_is_moving == False:
+            ship_speed -= 0.2
 
 
 def update_screen():
