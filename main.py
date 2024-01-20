@@ -39,7 +39,7 @@ asteroid_x = []
 asteroid_y = []
 asteroid_angle = []
 asteroid_speed = []
-no_asteroids = 10
+no_asteroids = 5
 
 bullet_x = []
 bullet_y = []
@@ -132,9 +132,9 @@ def update_screen():
     pygame.display.update()
     fps.tick(60)
     
-def isCollision(enemyX, enemyY, bulletX, bulletY):
+def isCollision(enemyX, enemyY, bulletX, bulletY, dist):
 	distance = math.sqrt(math.pow(enemyX - bulletX, 2)) + (math.pow(enemyY - bulletY, 2))
-	if distance < 70:
+	if distance < dist:
 		return True
 	else:
 		return False
@@ -162,9 +162,16 @@ def game_logic():
         if asteroid_x[i] > WIDTH:
             asteroid_x[i] = 0
             
-        if isCollision(ship_x, ship_y, asteroid_x[i], asteroid_y[i]):
+        if isCollision(ship_x, ship_y, asteroid_x[i], asteroid_y[i], 27):
             print('Game Over')
             exit()
+            
+    for i in range(0, no_bullets):
+        for j in range(0, no_asteroids):
+            if isCollision(bullet_x[i], bullet_y[i], asteroid_x[j], asteroid_y[j], 50):
+                asteroid_x[j] = random.randint(0, WIDTH)
+                asteroid_y[j] = random.randint(0, HEIGHT)
+                asteroid_angle[j] = random.randint(0, 365)
 
 
 # asteroids game loop
