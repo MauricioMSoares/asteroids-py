@@ -90,7 +90,7 @@ def handle_input():
                 ship_direction = 1
             elif event.key == K_UP:
                 ship_is_moving = True
-                ship_speed = 10
+                ship_speed = 6
 
         elif event.type == KEYUP:
             if event.key == K_LEFT or event.key == K_RIGHT:
@@ -115,10 +115,33 @@ def update_screen():
     pygame.display.update()
     fps.tick(60)
     
+def isCollision(enemyX, enemyY, bulletX, bulletY):
+	distance = math.sqrt(math.pow(enemyX - bulletX, 2)) + (math.pow(enemyY - bulletY, 2))
+	if distance < 70:
+		return True
+	else:
+		return False
+    
 def game_logic():
     for i in range(0, no_asteroids):
         asteroid_x[i] = (asteroid_x[i] + math.cos(math.radians(asteroid_angle[i])) * asteroid_speed[i])
         asteroid_y[i] = (asteroid_y[i] + -math.sin(math.radians(asteroid_angle[i])) * asteroid_speed[i])
+        
+        if asteroid_y[i] < 0:
+            asteroid_y[i] = HEIGHT
+            
+        if asteroid_y[i] > HEIGHT:
+            asteroid_y[i] = 0
+        
+        if asteroid_x[i] < 0:
+            asteroid_x[i] = WIDTH
+            
+        if asteroid_x[i] > WIDTH:
+            asteroid_x[i] = 0
+            
+        if isCollision(ship_x, ship_y, asteroid_x[i], asteroid_y[i]):
+            print('Game Over')
+            quit()
 
 
 # asteroids game loop
