@@ -24,6 +24,7 @@ bg = pygame.image.load(os.path.join("images", "bg.jpg"))
 debris = pygame.image.load(os.path.join("images", "debris2_brown.png"))
 ship = pygame.image.load(os.path.join("images", "ship.png"))
 ship_thrusted = pygame.image.load(os.path.join("images", "ship_thrusted.png"))
+asteroid = pygame.image.load(os.path.join("images", "asteroid.png"))
 
 ship_x = WIDTH / 2 - 50
 ship_y = HEIGHT / 2 - 50
@@ -33,6 +34,17 @@ ship_is_moving = False
 ship_direction = 0
 ship_speed = 0
 
+asteroid_x = []
+asteroid_y = []
+asteroid_angle = []
+asteroid_speed = []
+no_asteroids = 10
+
+for i in range(0, no_asteroids):
+    asteroid_x.append(random.randint(0, WIDTH))
+    asteroid_y.append(random.randint(0, HEIGHT))
+    asteroid_angle.append(random.randint(0, 365))
+    asteroid_speed.append(random.randint(1, 3))
 
 def rot_center(image, angle):
     orig_rect = image.get_rect()
@@ -51,6 +63,9 @@ def draw(canvas):
     canvas.blit(debris, (time * 0.3, 0))
     canvas.blit(debris, (time * 0.3 - WIDTH, 0))
     time += 1
+    
+    for i in range(0, no_asteroids):
+        canvas.blit(rot_center(asteroid, time), (asteroid_x[i], asteroid_y[i]))
     
     if ship_is_moving:
         canvas.blit(rot_center(ship_thrusted, ship_angle), (ship_x, ship_y))
@@ -99,11 +114,16 @@ def handle_input():
 def update_screen():
     pygame.display.update()
     fps.tick(60)
+    
+def game_logic():
+    for i in range(0, no_asteroids):
+        asteroid_x[i] = (asteroid_x[i] + math.cos(math.radians(asteroid_angle[i])) * asteroid_speed[i])
+        asteroid_y[i] = (asteroid_y[i] + -math.sin(math.radians(asteroid_angle[i])) * asteroid_speed[i])
 
 
 # asteroids game loop
 while True:
     draw(window)
     handle_input()
-    # game_logic()
+    game_logic()
     update_screen()
